@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="22f5654e-d1c6-4b1a-9a63-adbebd593ec5" name="ghtk">
+        <fileTransfer accessType="SFTP" host="10.150.0.38" port="22" sshConfigId="a762f621-96ab-44bc-aca8-d3a5adab02fb" sshConfig="vietnb@10.150.0.38:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
