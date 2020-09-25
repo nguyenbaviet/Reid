@@ -18,8 +18,12 @@ should be equal to (num_classes + 5) * number of anchors.
 
 #3.Person reid
 - Dataset for person in GHTK is located in /home/vietnb/reid/dataset/ghtk_dataset. It's still very small (about 230 images with 56 people). You need to create more data
- or join with some others dataset like market1501, dukemtmc,...
+ or join with some other datasets like market1501, dukemtmc,...
 - You can find the instructions for torch reid in https://kaiyangzhou.github.io/deep-person-reid/user_guide
 - To train model: run main.py in PersonReid's directory
 - To visualize heatmap: run actmap.py
 - To inference video: run main.py in root's directory
+#4.To do
+- Write some Data Augmentation for Person reid: flip, rotate, cutout, hue,...
+- Write reid's inference for 2 cameras
+- Try some other models in torchreid
