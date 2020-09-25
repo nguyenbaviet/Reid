@@ -12,7 +12,7 @@ You should follow https://github.com/AlexeyAB/darknet to install darknet and htt
 - To inference video: run sh test.sh in detector's folder
 - To test model with map score: run sh compute_map.sh in detector's folder
 - To specific anchor sizes for your dataset: run sh compute_anchors.sh in detector's folder. The result will be used for your config file instead of default anchor sizes. Note that the size of anchors at 1st-yolo-layer should
-smaller than 30x30, at 2nd-yolo-layer should smaller than 60x60  and the last yolo-layer should be the remaining. The filters in front of each yolo-layer 
+be smaller than 30x30, at 2nd-yolo-layer should be smaller than 60x60  and the last yolo-layer should be the remaining. The filters in front of each yolo-layer 
 should be equal to (num_classes + 5) * number of anchors.
 - For more improvements of yolov4, please follow https://github.com/AlexeyAB/darknet#how-to-improve-object-detection
 
