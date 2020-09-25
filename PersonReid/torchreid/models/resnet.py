@@ -4,6 +4,9 @@ Code source: https://github.com/pytorch/vision
 from __future__ import division, absolute_import
 import torch.utils.model_zoo as model_zoo
 from torch import nn
+import torch
+import cv2
+import numpy as np
 
 __all__ = [
     'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152',
@@ -340,6 +343,24 @@ class ResNet(nn.Module):
                     nn.init.constant_(m.bias, 0)
 
     def featuremaps(self, x):
+        def mask(x, ratio=0.3):
+            # Hard attention: focus on center image
+            # make a mask with eclipse shape and focus on it
+            _, _, h, w = x.shape
+            center = (int(w/2), int(h/2))
+            color = (255, 255, 255)
+
+
+            mask = np.ones((h, w)).astype(np.uint8) * int(255 * ratio)
+            polyn = cv2.ellipse2Poly(center, center, 0, 0, 360, 1)
+            mask = cv2.fillConvexPoly(mask, polyn, color)
+            mask = mask / 255
+            mask[0][0], mask[0][-1], mask[-1][0], mask[-1][-1] = ratio, ratio, ratio, ratio
+            mask = torch.tensor(mask)
+            mask = mask.cuda() if torch.cuda.is_available() else mask
+            return mask * x
+        x = mask(x)
+        x = x.float()
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -348,10 +369,13 @@ class ResNet(nn.Module):
         x = self.layer2(x)
         x = self.layer3(x)
         x = self.layer4(x)
-        return x
-
-    def forward(self, x):
+        x = mask(x)
+        return x.float()
+        # return x
+    def forward(self, x, return_featuremaps=False):
         f = self.featuremaps(x)
+        if return_featuremaps:
+            return f
         v = self.global_avgpool(f)
         v = v.view(v.size(0), -1)
 

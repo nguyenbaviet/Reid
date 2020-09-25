@@ -15,13 +15,18 @@ class Inference(engine.Engine):
         self.model = model.to(self.device)
         self.model.eval()
         self.gallery = datamanager.test_dataset['ghtk_dataset']['gallery']
-        # self.g_features = self._feature_extraction(datamanager.test_loader['ghtk_dataset']['gallery'])
-        # torch.save(self.g_features, 'gallery.pt')
-        self.g_features = torch.load('gallery.pt')
+        if os.path.exists('gallery.pt'):
+            self.g_features = torch.load('gallery.pt')
+        else:
+            self.g_features = self._feature_extraction(datamanager.test_loader['ghtk_dataset']['gallery'])
+            torch.save(self.g_features, 'gallery.pt')
         self.dist_metric = dist_metric
         self.image_size = image_size
 
     def preprocess_image(self, images, pixel_mean=[0.485, 0.456, 0.406], pixel_std=[0.229, 0.224, 0.225], pixel_norm=True):
+        # Do some transform for image.
+        # If you want do write some Data Augmentations like flip, rotate, cutout,...
+        # Please modify read_image function in PersonReid/torchreid/utils/tools.py
         def pre_process():
             transforms = []
             transforms += [T.Resize(self.image_size)]
@@ -49,15 +54,16 @@ class Inference(engine.Engine):
             features = self.extract_features(imgs)
             features = features.data.cpu()
             f_.append(features)
-            # pids_.extend(pids)
-            # camids_.extend(camids)
+            pids_.extend(pids)
+            camids_.extend(camids)
         f_ = torch.cat(f_, 0)
         f_ = f_.to(self.device)
-        # pids_ = np.asarray(pids_)
-        # camids_ = np.asarray(camids_)
+        pids_ = np.asarray(pids_)
+        camids_ = np.asarray(camids_)
         return f_, pids_, camids_
+
     def inference(self, queries):
-        assert isinstance(queries, list), 'Query must be a list of images!!!'
+        assert isinstance(queries, list), 'Query must be a list of images or np arrays!!!'
         ids = []
         d = []
 

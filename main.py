@@ -2,7 +2,6 @@ from PersonReid.inference import Inference
 from detector.darknet_images import image_detection
 from detector.darknet import bbox2points, load_network
 import cv2
-import numpy as np
 from threading import Thread
 from PersonReid.torchreid.data import ImageDataManager
 from PersonReid.torchreid.data.datasets.image.ghtk import GHTKDataset
@@ -11,28 +10,12 @@ from queue import Queue
 
 data.register_image_dataset('ghtk_dataset', GHTKDataset)
 
-# reid_datamanager = ImageDataManager(
-#         root='dataset',
-#         sources=['market1501', 'ghtk_dataset'],
-#         height=256,
-#         width=128,
-#         combineall=False,
-#         train_sampler='RandomIdentitySampler'
-#     )
-# model = models.build_model(
-#     name='resnet50',
-#     num_classes=reid_datamanager.num_train_pids,
-#     loss='triplet'
-# )
-#
-# infer_model = Inference(datamanager=reid_datamanager, model=model)
-# gallery = infer_model.gallery
-# for i in range(len(gallery)):
-#     print(gallery[i])
-#
-# exit()
-
 def video_capture(frame_queue, cap):
+    """
+    Get images from video and put to queue
+    :param frame_queue: Queue contains images to be proceesed
+    :param cap: a VideoCapture instance
+    """
     while cap.isOpened():
         print('cap')
         _, frame = cap.read()
@@ -43,6 +26,16 @@ def video_capture(frame_queue, cap):
 
 
 def get_detections(frame_queue, detections_queue, network, classnames, class_colors, thresh, cap):
+    """
+    Get image from frame_queue and detect instances.Put that instances to queue
+    :param frame_queue: Queue contains images to be processed
+    :param detections_queue: Queue contains resized image and detection's results
+    :param network: detections model
+    :param classnames: classnames of detection model
+    :param class_colors: color for each class detected by network
+    :param thresh: threshold for detection model
+    :param cap: a VideoCapture instance
+    """
     while cap.isOpened():
         if len(frame_queue.queue) == 0:
             continue
@@ -60,6 +53,12 @@ def get_detections(frame_queue, detections_queue, network, classnames, class_col
 
 
 def crop_image(detection_queue, crop_queue, cap):
+    """
+    Crop instances from image
+    :param detection_queue: Queue contains resized image and detection's results
+    :param crop_queue: Queue contains resized image and cropped images with its bounding box coordinate
+    :param cap: a VideoCapture instance
+    """
     while cap.isOpened():
         if len(detection_queue.queue) == 0:
             continue
@@ -80,6 +79,13 @@ def crop_image(detection_queue, crop_queue, cap):
 
 
 def reid(crop_queue, ids_queue, model, cap):
+    """
+    Do reid with instances
+    :param crop_queue: Queue contains resized image and cropped images with its bounding box coordinate
+    :param ids_queue: Queue contains resized image and id of instance with its bounding box coordinate
+    :param model: reid model
+    :param cap: a VideoCapture instance
+    """
     while cap.isOpened():
         if len(crop_queue.queue) == 0:
             continue
@@ -91,6 +97,11 @@ def reid(crop_queue, ids_queue, model, cap):
 
 
 def draw(ids_queue, cap):
+    """
+    Visualize the id into image and write it into a video.
+    :param ids_queue: Queue contains resized image and id of instance with its bounding box coordinate
+    :param cap: a VideoCapture instance
+    """
     video = cv2.VideoWriter('result_%s' %out_filename, cv2.VideoWriter_fourcc(*'MJPG'), 15, (1080, 720))
     while cap.isOpened():
         if len(ids_queue.queue) == 0:
@@ -119,7 +130,7 @@ if __name__ == '__main__':
     d_thresh = 0.25
 
     #Hyper-parameters for reid
-    r_weights = '/home/vietnb/reid/log/resnet50-triplet-ghtk/model/model.pth.tar-50'
+    r_weights = '/home/vietnb/reid/log/resnet50-triplet-ghtk-plus/model/model.pth.tar-100'
 
     cap = cv2.VideoCapture(vid_path)
 

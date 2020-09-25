@@ -140,7 +140,7 @@ def main():
 
     use_gpu = torch.cuda.is_available()
 
-    datamanager = torchreid.data.ImageDataManager(
+    datamanager = PersonReid.torchreid.data.ImageDataManager(
         root=args.root,
         sources=args.dataset,
         height=args.height,
@@ -152,7 +152,7 @@ def main():
     )
     test_loader = datamanager.test_loader
 
-    model = torchreid.models.build_model(
+    model = PersonReid.torchreid.models.build_model(
         name=args.model,
         num_classes=datamanager.num_train_pids,
         use_gpu=use_gpu
