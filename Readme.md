@@ -23,5 +23,3 @@ should be equal to (num_classes + 5) * number of anchors.
 - To train model: run main.py in PersonReid's directory
 - To visualize heatmap: run actmap.py
 - To inference video: run main.py in root's directory
-#4.To do
--
